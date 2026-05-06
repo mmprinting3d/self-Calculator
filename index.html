@@ -16,7 +16,7 @@
         }
         .math-grid {
             display: grid;
-            grid-template-columns: repeat(8, 3.5rem);
+            grid-template-columns: 2rem repeat(7, 3.5rem);
             gap: 0.25rem;
             justify-content: center;
             font-family: 'Courier New', Courier, monospace;
@@ -50,6 +50,14 @@
             font-size: 1.75rem;
             font-weight: bold;
             color: #64748b;
+        }
+        .place-label {
+            font-size: 0.55rem;
+            font-weight: 800;
+            text-align: center;
+            color: #94a3b8;
+            text-transform: uppercase;
+            padding-bottom: 2px;
         }
         .border-line {
             grid-column: span 8;
@@ -92,18 +100,32 @@
 
         <!-- Addition/Subtraction -->
         <div id="view-add" class="workspace-view">
-            <div class="math-grid">
+            <div class="math-grid" id="grid-add">
+                <!-- Place Value Labels -->
                 <div class="symbol"></div>
+                <div class="place-label">Millions</div>
+                <div class="place-label">H-thous</div>
+                <div class="place-label">T-thous</div>
+                <div class="place-label">Thous</div>
+                <div class="place-label">Hundreds</div>
+                <div class="place-label">Tens</div>
+                <div class="place-label">Ones</div>
+
+                <!-- Carry Row -->
+                <div class="symbol text-xs text-red-400">C</div>
                 <input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input">
                 
+                <!-- Number 1 -->
                 <div class="symbol"></div>
                 <input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input">
                 
+                <!-- Number 2 -->
                 <div class="symbol"><select class="bg-transparent outline-none cursor-pointer"><option>+</option><option>-</option></select></div>
                 <input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input">
                 
                 <div class="border-line"></div>
                 
+                <!-- Result -->
                 <div class="symbol">=</div>
                 <input type="number" class="cell-input font-black text-blue-600"><input type="number" class="cell-input font-black text-blue-600"><input type="number" class="cell-input font-black text-blue-600"><input type="number" class="cell-input font-black text-blue-600"><input type="number" class="cell-input font-black text-blue-600"><input type="number" class="cell-input font-black text-blue-600"><input type="number" class="cell-input font-black text-blue-600">
             </div>
@@ -111,8 +133,7 @@
 
         <!-- Multiplication -->
         <div id="view-mul" class="workspace-view hidden">
-            <div class="math-grid">
-                <!-- Multi-row carry support -->
+            <div class="math-grid" id="grid-mul">
                 <div class="symbol"></div>
                 <input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input">
                 
@@ -124,7 +145,6 @@
                 
                 <div class="border-line"></div>
                 
-                <!-- Steps (Partial Products) -->
                 <div class="symbol text-[10px] uppercase text-slate-400">Step 1</div>
                 <input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed">
                 
@@ -143,7 +163,7 @@
 
         <!-- Division (Fact Family Format) -->
         <div id="view-div" class="workspace-view hidden">
-            <div class="flex flex-col items-center gap-12 py-10">
+            <div class="flex flex-col items-center gap-12 py-10" id="grid-div">
                 
                 <!-- Division Statement -->
                 <div class="flex flex-col items-center">
@@ -199,6 +219,50 @@
             document.querySelectorAll('input').forEach(input => input.value = '');
         }
 
+        // Handle Arrow Key Navigation and Digit Limits
+        document.addEventListener('keydown', function(e) {
+            const active = document.activeElement;
+            if (active.tagName !== 'INPUT') return;
+
+            // Get all inputs in the current visible workspace
+            const currentView = document.querySelector('.workspace-view:not(.hidden)');
+            const inputs = Array.from(currentView.querySelectorAll('input'));
+            const index = inputs.indexOf(active);
+
+            if (index === -1) return;
+
+            // For grids with 7 inputs per row (Add and Mul)
+            // Note: Division is handled differently by DOM order
+            const isGrid = currentView.id === 'view-add' || currentView.id === 'view-mul';
+            const rowSize = isGrid ? 7 : 0; 
+
+            switch(e.key) {
+                case 'ArrowLeft':
+                    if (index > 0) inputs[index - 1].focus();
+                    break;
+                case 'ArrowRight':
+                    if (index < inputs.length - 1) inputs[index + 1].focus();
+                    break;
+                case 'ArrowUp':
+                    if (isGrid && index >= rowSize) {
+                        inputs[index - rowSize].focus();
+                    } else if (!isGrid && index > 2) {
+                        // For division, move from multiplication check to division statement
+                        inputs[index - 3].focus();
+                    }
+                    break;
+                case 'ArrowDown':
+                    if (isGrid && index + rowSize < inputs.length) {
+                        inputs[index + rowSize].focus();
+                    } else if (!isGrid && index <= 2) {
+                        // For division, move from division statement to multiplication check
+                        inputs[index + 3].focus();
+                    }
+                    break;
+            }
+        });
+
+        // Restrict input to single digits for the grids
         document.querySelectorAll('input[type="number"]').forEach(input => {
             input.addEventListener('input', function() {
                 if (this.classList.contains('cell-input')) {
