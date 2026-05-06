@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Place Value Math Table</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f1f5f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .math-table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+        }
+        .math-table th {
+            background-color: #1e293b;
+            color: white;
+            padding: 12px 4px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 1px solid #334155;
+        }
+        .math-table td {
+            padding: 10px 4px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        .math-input {
+            width: 55px; /* Slightly wider for multiple digits */
+            height: 50px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: 2px solid #cbd5e1;
+            background: white;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .math-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background-color: #f0f7ff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .operator-cell {
+            width: 60px;
+            background-color: #f8fafc;
+        }
+        .operator-select {
+            appearance: none;
+            background-color: #fef3c7;
+            border: 2px dashed #f59e0b;
+            border-radius: 8px;
+            width: 45px;
+            height: 45px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .result-row td {
+            background-color: #eff6ff;
+            border-top: 4px solid #1e293b;
+        }
+        .result-input {
+            border-color: #3b82f6;
+            color: #1d4ed8;
+            background-color: #f8faff;
+        }
+        .group-divider {
+            width: 12px;
+            border: none !important;
+            background: transparent !important;
+        }
+        /* Style for printing */
+        @media print {
+            .no-print { display: none; }
+            body { background: white; }
+            .shadow-2xl { shadow: none; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2">
+
+    <div class="bg-white w-full max-w-5xl p-4 md:p-8 rounded-3xl shadow-2xl overflow-hidden">
+        <header class="text-center mb-6">
+            <h1 class="text-2xl font-black text-slate-800 tracking-tight uppercase">Place Value Work Table</h1>
+            <p class="text-slate-500 text-sm">Use Arrow Keys to navigate. Enter multiple digits to regroup.</p>
+        </header>
+
+        <div class="overflow-x-auto">
+            <table class="math-table" id="calculation-table">
+                <thead>
+                    <tr>
+                        <th class="operator-cell">Sign</th>
+                        <th>Millions</th>
+                        <th class="group-divider"></th>
+                        <th colspan="3">Thousands</th>
+                        <th class="group-divider"></th>
+                        <th colspan="3">Ones / Units</th>
+                    </tr>
+                    <tr class="bg-slate-700 text-[10px] text-slate-300">
+                        <td></td>
+                        <td>M</td>
+                        <td class="group-divider"></td>
+                        <td>H-Th</td>
+                        <td>T-Th</td>
+                        <td>Th</td>
+                        <td class="group-divider"></td>
+                        <td>H</td>
+                        <td>T</td>
+                        <td>O</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Row 1 -->
+                    <tr class="math-row">
+                        <td class="operator-cell"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="0"></td>
+                        <td class="group-divider"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="1"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="2"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="3"></td>
+                        <td class="group-divider"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="4"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="5"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="6"></td>
+                    </tr>
+                    <!-- Row 2 -->
+                    <tr class="math-row">
+                        <td class="operator-cell">
+                            <select class="operator-select">
+                                <option value="+">+</option>
+                                <option value="-">−</option>
+                                <option value="x">×</option>
+                                <option value="/">÷</option>
+                            </select>
+                        </td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="0"></td>
+                        <td class="group-divider"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="1"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="2"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="3"></td>
+                        <td class="group-divider"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="4"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="5"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="6"></td>
+                    </tr>
+                    <!-- Row 3 -->
+                    <tr class="math-row">
+                        <td class="operator-cell">
+                            <select class="operator-select">
+                                <option value="+">+</option>
+                                <option value="-">−</option>
+                                <option value="x">×</option>
+                                <option value="/">÷</option>
+                            </select>
+                        </td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="0"></td>
+                        <td class="group-divider"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="1"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="2"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="3"></td>
+                        <td class="group-divider"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="4"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="5"></td>
+                        <td><input type="text" class="math-input" inputmode="numeric" data-col="6"></td>
+                    </tr>
+                    <!-- Result Row -->
+                    <tr class="result-row math-row">
+                        <td class="text-2xl font-bold text-slate-700">=</td>
+                        <td><input type="text" class="math-input result-input" inputmode="numeric" data-col="0"></td>
+                        <td class="group-divider"></td>
+                        <td><input type="text" class="math-input result-input" inputmode="numeric" data-col="1"></td>
+                        <td><input type="text" class="math-input result-input" inputmode="numeric" data-col="2"></td>
+                        <td><input type="text" class="math-input result-input" inputmode="numeric" data-col="3"></td>
+                        <td class="group-divider"></td>
+                        <td><input type="text" class="math-input result-input" inputmode="numeric" data-col="4"></td>
+                        <td><input type="text" class="math-input result-input" inputmode="numeric" data-col="5"></td>
+                        <td><input type="text" class="math-input result-input" inputmode="numeric" data-col="6"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-8 flex flex-col sm:flex-row gap-4 no-print">
+            <button onclick="window.print()" class="flex-1 bg-slate-800 text-white font-bold py-4 rounded-2xl hover:bg-slate-900 shadow-md transition-all active:scale-95">
+                Print Table
+            </button>
+            <button onclick="resetAll()" class="flex-1 border-2 border-slate-200 text-slate-600 font-bold py-4 rounded-2xl hover:bg-slate-50 transition-all active:scale-95">
+                Reset All
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function resetAll() {
+            document.querySelectorAll('input').forEach(i => i.value = '');
+            document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+        }
+
+        const inputs = document.querySelectorAll('.math-input');
+        const rows = document.querySelectorAll('.math-row');
+
+        inputs.forEach((input, index) => {
+            // Clean non-numeric input but allow multiple digits
+            input.addEventListener('input', (e) => {
+                input.value = input.value.replace(/[^0-9]/g, '');
+            });
+
+            input.addEventListener('keydown', (e) => {
+                const currentRow = Array.from(rows).indexOf(input.closest('.math-row'));
+                const currentCol = parseInt(input.dataset.col);
+
+                // Movement keys
+                if (e.key === 'ArrowRight') {
+                    // Navigate Right
+                    const nextInput = document.querySelector(`.math-row:nth-child(${currentRow + 1}) .math-input[data-col="${currentCol + 1}"]`);
+                    if (nextInput) {
+                        nextInput.focus();
+                        e.preventDefault();
+                    }
+                } 
+                else if (e.key === 'ArrowLeft') {
+                    // Navigate Left
+                    const prevInput = document.querySelector(`.math-row:nth-child(${currentRow + 1}) .math-input[data-col="${currentCol - 1}"]`);
+                    if (prevInput) {
+                        prevInput.focus();
+                        e.preventDefault();
+                    }
+                } 
+                else if (e.key === 'ArrowDown') {
+                    // Navigate Down
+                    const downInput = document.querySelector(`.math-row:nth-child(${currentRow + 2}) .math-input[data-col="${currentCol}"]`);
+                    if (downInput) {
+                        downInput.focus();
+                        e.preventDefault();
+                    }
+                } 
+                else if (e.key === 'ArrowUp') {
+                    // Navigate Up
+                    const upInput = document.querySelector(`.math-row:nth-child(${currentRow}) .math-input[data-col="${currentCol}"]`);
+                    if (upInput) {
+                        upInput.focus();
+                        e.preventDefault();
+                    }
+                }
+                // Backspace logic to jump back if empty
+                else if (e.key === 'Backspace' && input.value.length === 0) {
+                    const prevInput = document.querySelector(`.math-row:nth-child(${currentRow + 1}) .math-input[data-col="${currentCol - 1}"]`);
+                    if (prevInput) {
+                        prevInput.focus();
+                        e.preventDefault();
+                    }
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
