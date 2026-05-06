@@ -36,7 +36,6 @@
             background-color: #f8fafc;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
-        /* Special class for multiplication steps to allow parentheses/symbols */
         .mul-step-input {
             font-size: 1.1rem;
             color: #6366f1;
@@ -72,18 +71,27 @@
             margin: 0.5rem 0;
             border-radius: 2px;
         }
-        .breakdown-input {
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 0.5rem;
-            padding: 0.5rem;
-            font-size: 1.25rem;
+        /* Subtraction Specific Styles */
+        .sub-block {
+            padding: 1.5rem;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+        }
+        .sub-input-wide {
+            width: 100%;
+            height: 3.5rem;
+            padding: 0 1rem;
+            font-size: 1.5rem;
             font-weight: bold;
             text-align: right;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.75rem;
             outline: none;
-            width: 100%;
+            transition: border-color 0.2s;
         }
-        .breakdown-input:focus {
+        .sub-input-wide:focus {
             border-color: #f59e0b;
             background-color: #fffbeb;
         }
@@ -96,6 +104,22 @@
             border-radius: 0.75rem;
             outline: none;
             transition: all 0.2s;
+        }
+        .auto-total-box {
+            font-family: 'Courier New', Courier, monospace;
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 2px dashed #cbd5e1;
+            min-height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #475569;
         }
     </style>
 </head>
@@ -138,32 +162,135 @@
             </div>
         </div>
 
-        <!-- Subtraction Breakdown -->
-        <div id="view-sub" class="workspace-view hidden max-w-2xl mx-auto">
-            <div class="mb-8 text-center bg-amber-50 p-4 rounded-xl border border-amber-100">
-                <p class="text-amber-700 font-bold text-sm uppercase">Expanded Subtraction</p>
-                <p class="text-amber-600 text-xs">Break the numbers down into parts, then subtract!</p>
+        <!-- Subtraction Layout -->
+        <div id="view-sub" class="workspace-view hidden max-w-3xl mx-auto">
+            <div class="mb-6 text-center bg-amber-50 p-4 rounded-xl border border-amber-100">
+                <p class="text-amber-700 font-bold text-sm uppercase">Column Subtraction Blocks</p>
+                <p class="text-amber-600 text-xs">Enter your results to see the addition equation at the bottom!</p>
             </div>
-            <div id="breakdown-container">
-                <div class="breakdown-row"><input type="text" class="breakdown-input" placeholder="600,000"><span class="font-bold text-slate-400">−</span><input type="text" class="breakdown-input" placeholder="300,000"><span class="font-bold text-slate-400">=</span><input type="text" class="breakdown-input text-amber-600" placeholder="300,000"></div>
-                <div class="breakdown-row"><input type="text" class="breakdown-input"><span class="font-bold text-slate-400">−</span><input type="text" class="breakdown-input"><span class="font-bold text-slate-400">=</span><input type="text" class="breakdown-input text-amber-600"></div>
-                <div class="breakdown-row"><input type="text" class="breakdown-input"><span class="font-bold text-slate-400">−</span><input type="text" class="breakdown-input"><span class="font-bold text-slate-400">=</span><input type="text" class="breakdown-input text-amber-600"></div>
-                <div class="breakdown-row"><input type="text" class="breakdown-input"><span class="font-bold text-slate-400">−</span><input type="text" class="breakdown-input"><span class="font-bold text-slate-400">=</span><input type="text" class="breakdown-input text-amber-600"></div>
-                <div class="breakdown-row"><input type="text" class="breakdown-input"><span class="font-bold text-slate-400">−</span><input type="text" class="breakdown-input"><span class="font-bold text-slate-400">=</span><input type="text" class="breakdown-input text-amber-600"></div>
+
+            <!-- 7 Blocks of Subtraction -->
+            <div id="subtraction-blocks-container">
+                <div class="sub-block">
+                    <div class="flex flex-col gap-2">
+                        <input type="text" class="sub-input-wide" placeholder="Top Number">
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400 font-bold text-2xl w-8 text-center">−</span>
+                            <input type="text" class="sub-input-wide" placeholder="Bottom Number">
+                        </div>
+                        <div class="h-1 bg-slate-800 my-1 rounded"></div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400 font-bold text-2xl w-8 text-center">=</span>
+                            <input type="text" class="sub-input-wide sub-result-input text-amber-600 border-amber-200 bg-amber-50" placeholder="Result">
+                        </div>
+                    </div>
+                </div>
+                <!-- Repeated 6 more times -->
+                <div class="sub-block">
+                    <div class="flex flex-col gap-2">
+                        <input type="text" class="sub-input-wide">
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400 font-bold text-2xl w-8 text-center">−</span>
+                            <input type="text" class="sub-input-wide">
+                        </div>
+                        <div class="h-1 bg-slate-800 my-1 rounded"></div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400 font-bold text-2xl w-8 text-center">=</span>
+                            <input type="text" class="sub-input-wide sub-result-input text-amber-600 border-amber-200 bg-amber-50">
+                        </div>
+                    </div>
+                </div>
+                <div class="sub-block">
+                    <div class="flex flex-col gap-2">
+                        <input type="text" class="sub-input-wide">
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400 font-bold text-2xl w-8 text-center">−</span>
+                            <input type="text" class="sub-input-wide">
+                        </div>
+                        <div class="h-1 bg-slate-800 my-1 rounded"></div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400 font-bold text-2xl w-8 text-center">=</span>
+                            <input type="text" class="sub-input-wide sub-result-input text-amber-600 border-amber-200 bg-amber-50">
+                        </div>
+                    </div>
+                </div>
+                <div class="sub-block">
+                    <div class="flex flex-col gap-2">
+                        <input type="text" class="sub-input-wide">
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400 font-bold text-2xl w-8 text-center">−</span>
+                            <input type="text" class="sub-input-wide">
+                        </div>
+                        <div class="h-1 bg-slate-800 my-1 rounded"></div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400 font-bold text-2xl w-8 text-center">=</span>
+                            <input type="text" class="sub-input-wide sub-result-input text-amber-600 border-amber-200 bg-amber-50">
+                        </div>
+                    </div>
+                </div>
+                <div class="sub-block">
+                    <div class="flex flex-col gap-2">
+                        <input type="text" class="sub-input-wide">
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400 font-bold text-2xl w-8 text-center">−</span>
+                            <input type="text" class="sub-input-wide">
+                        </div>
+                        <div class="h-1 bg-slate-800 my-1 rounded"></div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400 font-bold text-2xl w-8 text-center">=</span>
+                            <input type="text" class="sub-input-wide sub-result-input text-amber-600 border-amber-200 bg-amber-50">
+                        </div>
+                    </div>
+                </div>
+                <div class="sub-block">
+                    <div class="flex flex-col gap-2">
+                        <input type="text" class="sub-input-wide">
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400 font-bold text-2xl w-8 text-center">−</span>
+                            <input type="text" class="sub-input-wide">
+                        </div>
+                        <div class="h-1 bg-slate-800 my-1 rounded"></div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400 font-bold text-2xl w-8 text-center">=</span>
+                            <input type="text" class="sub-input-wide sub-result-input text-amber-600 border-amber-200 bg-amber-50">
+                        </div>
+                    </div>
+                </div>
+                <div class="sub-block">
+                    <div class="flex flex-col gap-2">
+                        <input type="text" class="sub-input-wide">
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400 font-bold text-2xl w-8 text-center">−</span>
+                            <input type="text" class="sub-input-wide">
+                        </div>
+                        <div class="h-1 bg-slate-800 my-1 rounded"></div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400 font-bold text-2xl w-8 text-center">=</span>
+                            <input type="text" class="sub-input-wide sub-result-input text-amber-600 border-amber-200 bg-amber-50">
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <!-- Totaling Section -->
             <div class="mt-8 pt-6 border-t-4 border-slate-800">
-                <div class="flex flex-col gap-2">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Final Combination</p>
-                    <div class="flex items-center gap-3"><span class="text-xl font-black text-slate-800">TOTAL:</span><input type="text" class="breakdown-input text-2xl text-green-600 border-green-200 bg-green-50" placeholder="319,175"></div>
+                <div class="flex flex-col gap-4">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Addition Check (Solve it yourself!)</p>
+                    
+                    <div id="sub-total-string" class="auto-total-box">
+                        <span class="text-slate-300 italic">Enter results above to see the sequence...</span>
+                    </div>
+
+                    <div class="flex items-center gap-3 mt-2">
+                        <span class="text-xl font-black text-slate-800">GRAND TOTAL:</span>
+                        <input type="text" id="sub-grand-total" class="sub-input-wide text-2xl text-green-600 border-green-200 bg-green-50" placeholder="Type your final answer here">
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Multiplication -->
         <div id="view-mul" class="workspace-view hidden">
-            <div class="mb-4 text-center">
-                <p class="text-xs font-bold text-slate-400 uppercase">Tip: You can now type ( ) and numbers in the step rows below.</p>
-            </div>
             <div class="math-grid">
                 <div class="symbol text-xs text-red-400">C</div>
                 <input type="number" class="cell-input carry-input multi-digit"><input type="number" class="cell-input carry-input multi-digit"><input type="number" class="cell-input carry-input multi-digit"><input type="number" class="cell-input carry-input multi-digit"><input type="number" class="cell-input carry-input multi-digit"><input type="number" class="cell-input carry-input multi-digit"><input type="number" class="cell-input carry-input multi-digit">
@@ -176,7 +303,6 @@
                 
                 <div class="border-line"></div>
                 
-                <!-- Steps with text support for parentheses -->
                 <div class="symbol text-[10px] uppercase text-slate-400">Step 1</div>
                 <input type="text" class="cell-input border-dashed mul-step-input"><input type="text" class="cell-input border-dashed mul-step-input"><input type="text" class="cell-input border-dashed mul-step-input"><input type="text" class="cell-input border-dashed mul-step-input"><input type="text" class="cell-input border-dashed mul-step-input"><input type="text" class="cell-input border-dashed mul-step-input"><input type="text" class="cell-input border-dashed mul-step-input">
                 
@@ -232,6 +358,28 @@
 
         function clearAll() {
             document.querySelectorAll('input').forEach(input => input.value = '');
+            updateSubtractionSequence();
+        }
+
+        // Logic for tracking subtraction sequence
+        function updateSubtractionSequence() {
+            const results = Array.from(document.querySelectorAll('.sub-result-input'));
+            const container = document.getElementById('sub-total-string');
+            
+            let values = [];
+
+            results.forEach(input => {
+                const cleanVal = input.value.trim();
+                if (cleanVal !== "") {
+                    values.push(cleanVal);
+                }
+            });
+
+            if (values.length === 0) {
+                container.innerHTML = '<span class="text-slate-300 italic">Enter results above to see the sequence...</span>';
+            } else {
+                container.innerHTML = values.join(' + ') + ' = ?';
+            }
         }
 
         document.addEventListener('keydown', function(e) {
@@ -244,10 +392,8 @@
 
             if (currentView.id === 'view-sub') {
                 switch(e.key) {
-                    case 'ArrowLeft': if (index > 0) inputs[index - 1].focus(); break;
-                    case 'ArrowRight': if (index < inputs.length - 1) inputs[index + 1].focus(); break;
-                    case 'ArrowUp': if (index >= 3) inputs[index - 3].focus(); break;
-                    case 'ArrowDown': if (index + 3 < inputs.length) inputs[index + 3].focus(); break;
+                    case 'ArrowUp': if (index > 0) inputs[index - 1].focus(); break;
+                    case 'ArrowDown': if (index < inputs.length - 1) inputs[index + 1].focus(); break;
                     case 'Enter': if (index + 1 < inputs.length) inputs[index + 1].focus(); break;
                 }
                 return;
@@ -266,15 +412,16 @@
 
         document.querySelectorAll('input').forEach(input => {
             input.addEventListener('input', function() {
-                // If it is a step row, allow multiple characters (symbols, parentheses)
-                if (this.classList.contains('mul-step-input')) {
-                    if (this.value.length > 8) this.value = this.value.slice(0, 8);
+                if (this.classList.contains('sub-result-input')) {
+                    updateSubtractionSequence();
                 }
-                // Single digit for normal grid cells
+
+                if (this.classList.contains('mul-step-input')) {
+                    if (this.value.length > 12) this.value = this.value.slice(0, 12);
+                }
                 else if (this.classList.contains('cell-input') && !this.classList.contains('multi-digit')) {
                      if (this.value.length > 1) this.value = this.value.slice(-1);
                 } 
-                // Carry limit
                 else if (this.classList.contains('multi-digit')) {
                     if (this.value.length > 2) this.value = this.value.slice(0, 2);
                 }
