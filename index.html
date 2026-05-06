@@ -3,263 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Place Value Math Table</title>
+    <title>Math Process Workspace</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            background-color: #f1f5f9;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
-        .math-table {
-            border-collapse: separate;
-            border-spacing: 0;
-            width: 100%;
+        input[type=number] {
+            -moz-appearance: textfield;
         }
-        .math-table th {
-            background-color: #1e293b;
-            color: white;
-            padding: 12px 4px;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border: 1px solid #334155;
+        .math-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 3.5rem);
+            gap: 0.25rem;
+            justify-content: center;
+            font-family: 'Courier New', Courier, monospace;
         }
-        .math-table td {
-            padding: 10px 4px;
+        .cell-input {
+            width: 3.5rem;
+            height: 3.5rem;
             text-align: center;
-            border: 1px solid #e2e8f0;
+            font-size: 1.5rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            background-color: white;
         }
-        .math-input {
-            width: 55px; /* Slightly wider for multiple digits */
-            height: 50px;
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border: 2px solid #cbd5e1;
-            background: white;
-            border-radius: 6px;
-            transition: all 0.2s;
-        }
-        .math-input:focus {
-            outline: none;
+        .cell-input:focus {
             border-color: #3b82f6;
-            background-color: #f0f7ff;
+            outline: none;
+            background-color: #f8fafc;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
-        .operator-cell {
-            width: 60px;
-            background-color: #f8fafc;
+        .carry-input {
+            height: 2.2rem;
+            font-size: 1.1rem;
+            color: #ef4444;
+            border-style: dashed;
+            background-color: #fff1f2;
         }
-        .operator-select {
-            appearance: none;
-            background-color: #fef3c7;
-            border: 2px dashed #f59e0b;
-            border-radius: 8px;
-            width: 45px;
-            height: 45px;
-            text-align: center;
-            font-size: 1.2rem;
+        .symbol {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
             font-weight: bold;
-            cursor: pointer;
+            color: #64748b;
         }
-        .result-row td {
-            background-color: #eff6ff;
-            border-top: 4px solid #1e293b;
+        .border-line {
+            grid-column: span 8;
+            height: 4px;
+            background-color: #334155;
+            margin: 0.5rem 0;
+            border-radius: 2px;
         }
-        .result-input {
-            border-color: #3b82f6;
-            color: #1d4ed8;
-            background-color: #f8faff;
+        .fact-input {
+            width: 5rem;
+            height: 4rem;
+            text-align: center;
+            font-size: 1.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.75rem;
+            outline: none;
+            transition: all 0.2s;
         }
-        .group-divider {
-            width: 12px;
-            border: none !important;
-            background: transparent !important;
-        }
-        /* Style for printing */
-        @media print {
-            .no-print { display: none; }
-            body { background: white; }
-            .shadow-2xl { shadow: none; }
+        .fact-input:focus {
+            border-color: #6366f1;
+            background-color: #f5f3ff;
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-2">
+<body class="bg-slate-50 min-h-screen p-4 md:p-8">
 
-    <div class="bg-white w-full max-w-5xl p-4 md:p-8 rounded-3xl shadow-2xl overflow-hidden">
-        <header class="text-center mb-6">
-            <h1 class="text-2xl font-black text-slate-800 tracking-tight uppercase">Place Value Work Table</h1>
-            <p class="text-slate-500 text-sm">Use Arrow Keys to navigate. Enter multiple digits to regroup.</p>
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-10 border border-slate-200">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-10 border-b pb-6 gap-6">
+            <div>
+                <h1 class="text-2xl font-black text-slate-800 tracking-tight">MATH WORKSPACE</h1>
+                <p class="text-slate-500 font-medium">No robot answers—just your brain!</p>
+            </div>
+            <nav class="flex bg-slate-100 p-1.5 rounded-xl gap-1">
+                <button onclick="setMode('add')" id="btn-add" class="mode-btn bg-white shadow-sm text-blue-600 px-5 py-2.5 rounded-lg font-bold transition">Add/Sub</button>
+                <button onclick="setMode('mul')" id="btn-mul" class="mode-btn text-slate-600 hover:bg-slate-200 px-5 py-2.5 rounded-lg font-bold transition">Multiplication</button>
+                <button onclick="setMode('div')" id="btn-div" class="mode-btn text-slate-600 hover:bg-slate-200 px-5 py-2.5 rounded-lg font-bold transition">Division</button>
+            </nav>
+            <button onclick="clearAll()" class="text-slate-400 hover:text-red-500 transition-colors text-xs font-black uppercase tracking-widest">Clear Everything</button>
         </header>
 
-        <div class="overflow-x-auto">
-            <table class="math-table" id="calculation-table">
-                <thead>
-                    <tr>
-                        <th class="operator-cell">Sign</th>
-                        <th>Millions</th>
-                        <th class="group-divider"></th>
-                        <th colspan="3">Thousands</th>
-                        <th class="group-divider"></th>
-                        <th colspan="3">Ones / Units</th>
-                    </tr>
-                    <tr class="bg-slate-700 text-[10px] text-slate-300">
-                        <td></td>
-                        <td>M</td>
-                        <td class="group-divider"></td>
-                        <td>H-Th</td>
-                        <td>T-Th</td>
-                        <td>Th</td>
-                        <td class="group-divider"></td>
-                        <td>H</td>
-                        <td>T</td>
-                        <td>O</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Row 1 -->
-                    <tr class="math-row">
-                        <td class="operator-cell"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="0"></td>
-                        <td class="group-divider"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="1"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="2"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="3"></td>
-                        <td class="group-divider"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="4"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="5"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="6"></td>
-                    </tr>
-                    <!-- Row 2 -->
-                    <tr class="math-row">
-                        <td class="operator-cell">
-                            <select class="operator-select">
-                                <option value="+">+</option>
-                                <option value="-">−</option>
-                                <option value="x">×</option>
-                                <option value="/">÷</option>
-                            </select>
-                        </td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="0"></td>
-                        <td class="group-divider"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="1"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="2"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="3"></td>
-                        <td class="group-divider"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="4"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="5"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="6"></td>
-                    </tr>
-                    <!-- Row 3 -->
-                    <tr class="math-row">
-                        <td class="operator-cell">
-                            <select class="operator-select">
-                                <option value="+">+</option>
-                                <option value="-">−</option>
-                                <option value="x">×</option>
-                                <option value="/">÷</option>
-                            </select>
-                        </td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="0"></td>
-                        <td class="group-divider"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="1"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="2"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="3"></td>
-                        <td class="group-divider"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="4"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="5"></td>
-                        <td><input type="text" class="math-input" inputmode="numeric" data-col="6"></td>
-                    </tr>
-                    <!-- Result Row -->
-                    <tr class="result-row math-row">
-                        <td class="text-2xl font-bold text-slate-700">=</td>
-                        <td><input type="text" class="math-input result-input" inputmode="numeric" data-col="0"></td>
-                        <td class="group-divider"></td>
-                        <td><input type="text" class="math-input result-input" inputmode="numeric" data-col="1"></td>
-                        <td><input type="text" class="math-input result-input" inputmode="numeric" data-col="2"></td>
-                        <td><input type="text" class="math-input result-input" inputmode="numeric" data-col="3"></td>
-                        <td class="group-divider"></td>
-                        <td><input type="text" class="math-input result-input" inputmode="numeric" data-col="4"></td>
-                        <td><input type="text" class="math-input result-input" inputmode="numeric" data-col="5"></td>
-                        <td><input type="text" class="math-input result-input" inputmode="numeric" data-col="6"></td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Addition/Subtraction -->
+        <div id="view-add" class="workspace-view">
+            <div class="math-grid">
+                <div class="symbol"></div>
+                <input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input">
+                
+                <div class="symbol"></div>
+                <input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input">
+                
+                <div class="symbol"><select class="bg-transparent outline-none cursor-pointer"><option>+</option><option>-</option></select></div>
+                <input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input">
+                
+                <div class="border-line"></div>
+                
+                <div class="symbol">=</div>
+                <input type="number" class="cell-input font-black text-blue-600"><input type="number" class="cell-input font-black text-blue-600"><input type="number" class="cell-input font-black text-blue-600"><input type="number" class="cell-input font-black text-blue-600"><input type="number" class="cell-input font-black text-blue-600"><input type="number" class="cell-input font-black text-blue-600"><input type="number" class="cell-input font-black text-blue-600">
+            </div>
         </div>
 
-        <div class="mt-8 flex flex-col sm:flex-row gap-4 no-print">
-            <button onclick="window.print()" class="flex-1 bg-slate-800 text-white font-bold py-4 rounded-2xl hover:bg-slate-900 shadow-md transition-all active:scale-95">
-                Print Table
-            </button>
-            <button onclick="resetAll()" class="flex-1 border-2 border-slate-200 text-slate-600 font-bold py-4 rounded-2xl hover:bg-slate-50 transition-all active:scale-95">
-                Reset All
-            </button>
+        <!-- Multiplication -->
+        <div id="view-mul" class="workspace-view hidden">
+            <div class="math-grid">
+                <!-- Multi-row carry support -->
+                <div class="symbol"></div>
+                <input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input"><input type="number" class="cell-input carry-input">
+                
+                <div class="symbol"></div>
+                <input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input">
+                
+                <div class="symbol">×</div>
+                <input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input"><input type="number" class="cell-input">
+                
+                <div class="border-line"></div>
+                
+                <!-- Steps (Partial Products) -->
+                <div class="symbol text-[10px] uppercase text-slate-400">Step 1</div>
+                <input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed">
+                
+                <div class="symbol text-[10px] uppercase text-slate-400">Step 2</div>
+                <input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed">
+
+                <div class="symbol text-[10px] uppercase text-slate-400">Step 3</div>
+                <input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed"><input type="number" class="cell-input border-dashed">
+                
+                <div class="border-line"></div>
+
+                <div class="symbol">Total</div>
+                <input type="number" class="cell-input font-black text-green-600"><input type="number" class="cell-input font-black text-green-600"><input type="number" class="cell-input font-black text-green-600"><input type="number" class="cell-input font-black text-green-600"><input type="number" class="cell-input font-black text-green-600"><input type="number" class="cell-input font-black text-green-600"><input type="number" class="cell-input font-black text-green-600">
+            </div>
         </div>
+
+        <!-- Division (Fact Family Format) -->
+        <div id="view-div" class="workspace-view hidden">
+            <div class="flex flex-col items-center gap-12 py-10">
+                
+                <!-- Division Statement -->
+                <div class="flex flex-col items-center">
+                    <p class="text-slate-400 font-bold uppercase tracking-widest text-xs mb-6">Division Statement</p>
+                    <div class="flex items-center gap-4 text-3xl font-bold">
+                        <input type="number" class="fact-input w-40 border-slate-300" placeholder="56">
+                        <span class="text-slate-400">÷</span>
+                        <input type="number" class="fact-input w-24 border-slate-300" placeholder="8">
+                        <span class="text-slate-400">=</span>
+                        <input type="number" class="fact-input w-24 border-blue-500 bg-blue-50 text-blue-700" placeholder="7">
+                    </div>
+                </div>
+
+                <div class="w-full max-w-md h-px bg-slate-100 relative">
+                    <span class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-slate-400 font-black text-[10px] tracking-tighter">IS THE SAME AS</span>
+                </div>
+
+                <!-- Multiplication Check -->
+                <div class="flex flex-col items-center">
+                    <p class="text-indigo-400 font-bold uppercase tracking-widest text-xs mb-6">Multiplication Check</p>
+                    <div class="flex items-center gap-4 text-3xl font-bold">
+                        <input type="number" class="fact-input w-24 border-indigo-200" placeholder="7">
+                        <span class="text-slate-400">×</span>
+                        <input type="number" class="fact-input w-24 border-indigo-200" placeholder="8">
+                        <span class="text-slate-400">=</span>
+                        <input type="number" class="fact-input w-40 border-indigo-400 bg-indigo-50 text-indigo-700" placeholder="56">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <footer class="mt-10 pt-8 border-t text-center text-slate-400 text-sm font-medium">
+            Remember: $56 / 8 = 7$ is true because $7 \times 8 = 56$!
+        </footer>
     </div>
 
     <script>
-        function resetAll() {
-            document.querySelectorAll('input').forEach(i => i.value = '');
-            document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
-        }
-
-        const inputs = document.querySelectorAll('.math-input');
-        const rows = document.querySelectorAll('.math-row');
-
-        inputs.forEach((input, index) => {
-            // Clean non-numeric input but allow multiple digits
-            input.addEventListener('input', (e) => {
-                input.value = input.value.replace(/[^0-9]/g, '');
+        function setMode(mode) {
+            document.querySelectorAll('.workspace-view').forEach(v => v.classList.add('hidden'));
+            document.querySelectorAll('.mode-btn').forEach(b => {
+                b.classList.remove('bg-white', 'shadow-sm', 'text-blue-600');
+                b.classList.add('text-slate-600', 'hover:bg-slate-200');
             });
 
-            input.addEventListener('keydown', (e) => {
-                const currentRow = Array.from(rows).indexOf(input.closest('.math-row'));
-                const currentCol = parseInt(input.dataset.col);
+            document.getElementById('view-' + mode).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + mode);
+            activeBtn.classList.add('bg-white', 'shadow-sm', 'text-blue-600');
+            activeBtn.classList.remove('text-slate-600', 'hover:bg-slate-200');
+        }
 
-                // Movement keys
-                if (e.key === 'ArrowRight') {
-                    // Navigate Right
-                    const nextInput = document.querySelector(`.math-row:nth-child(${currentRow + 1}) .math-input[data-col="${currentCol + 1}"]`);
-                    if (nextInput) {
-                        nextInput.focus();
-                        e.preventDefault();
-                    }
-                } 
-                else if (e.key === 'ArrowLeft') {
-                    // Navigate Left
-                    const prevInput = document.querySelector(`.math-row:nth-child(${currentRow + 1}) .math-input[data-col="${currentCol - 1}"]`);
-                    if (prevInput) {
-                        prevInput.focus();
-                        e.preventDefault();
-                    }
-                } 
-                else if (e.key === 'ArrowDown') {
-                    // Navigate Down
-                    const downInput = document.querySelector(`.math-row:nth-child(${currentRow + 2}) .math-input[data-col="${currentCol}"]`);
-                    if (downInput) {
-                        downInput.focus();
-                        e.preventDefault();
-                    }
-                } 
-                else if (e.key === 'ArrowUp') {
-                    // Navigate Up
-                    const upInput = document.querySelector(`.math-row:nth-child(${currentRow}) .math-input[data-col="${currentCol}"]`);
-                    if (upInput) {
-                        upInput.focus();
-                        e.preventDefault();
-                    }
-                }
-                // Backspace logic to jump back if empty
-                else if (e.key === 'Backspace' && input.value.length === 0) {
-                    const prevInput = document.querySelector(`.math-row:nth-child(${currentRow + 1}) .math-input[data-col="${currentCol - 1}"]`);
-                    if (prevInput) {
-                        prevInput.focus();
-                        e.preventDefault();
-                    }
+        function clearAll() {
+            document.querySelectorAll('input').forEach(input => input.value = '');
+        }
+
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.classList.contains('cell-input')) {
+                     if (this.value.length > 1) this.value = this.value.slice(-1);
                 }
             });
         });
     </script>
-
 </body>
 </html>
